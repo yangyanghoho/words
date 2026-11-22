@@ -1,0 +1,25 @@
+{
+  "name": "拾词 · PTE 学术词汇",
+  "short_name": "拾词",
+  "description": "按 PTE Academic 考点整理的学术词汇，间隔重复 + 四选一 + 拼写，可导入自己的词表，离线可用。",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#f6f3ee",
+  "theme_color": "#f6f3ee",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "今天背词", "url": "./" },
+    { "name": "做测验", "url": "./#quiz" },
+    { "name": "看统计", "url": "./#stat" }
+  ]
+}

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>拾词 · PTE 学术词汇</title>
+  <meta name="description" content="按 PTE Academic 考点整理的学术词汇，间隔重复 + 四选一 + 拼写，支持导入自己的词表，离线可用。" />
+  <meta name="theme-color" content="#f6f3ee" id="metaTheme" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="拾词" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f3a3a'/%3E%3Cpath d='M16 18h22a8 8 0 0 1 8 8v22H24a8 8 0 0 1-8-8z' fill='%23f6f3ee'/%3E%3Cpath d='M23 28h16M23 35h16M23 42h10' stroke='%232f3a3a' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <script>
+    (function () {
+      var d = document.documentElement, t = null;
+      try { t = localStorage.getItem('shici-theme'); } catch (e) {}
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      d.dataset.theme = t;
+      d.classList.add('js');
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="js/words.js"></script>
+  <script defer src="js/srs.js"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到正文</a>
+
+  <header class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">拾</span>
+      <span class="brand-t"><strong>拾词</strong><small>PTE 学术词汇</small></span>
+    </div>
+    <div class="top-right">
+      <span class="streak" id="streakBox" title="连续学习天数">🔥 <b id="streak">0</b></span>
+      <button class="btn ghost sm" id="installBtn" type="button" hidden>装到桌面</button>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="切换深色 / 浅色">
+        <span class="t-day" aria-hidden="true">☀</span><span class="t-night" aria-hidden="true">☾</span>
+      </button>
+      <button class="icon-btn" id="helpBtn" type="button" aria-label="使用说明">?</button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="功能切换">
+    <button class="tab" role="tab" data-view="learn" aria-selected="true">背词</button>
+    <button class="tab" role="tab" data-view="quiz" aria-selected="false">测验</button>
+    <button class="tab" role="tab" data-view="list" aria-selected="false">词表</button>
+    <button class="tab" role="tab" data-view="stat" aria-selected="false">统计</button>
+  </nav>
+
+  <main id="main">
+    <!-- 背词 -->
+    <section class="view on" id="view-learn" role="tabpanel" aria-label="背词">
+      <div class="bar">
+        <select id="deckSel" aria-label="选择词单"></select>
+        <span class="progress-wrap"><i class="progress" id="sessionBar"></i></span>
+        <span class="counter" id="counter">0 / 0</span>
+      </div>
+
+      <div class="card-area" id="cardArea">
+        <article class="card" id="card" tabindex="0" role="button" aria-label="点击翻面查看释义">
+          <div class="face front">
+            <p class="pos" id="cPos"></p>
+            <h2 class="word" id="cWord">准备好了吗</h2>
+            <p class="ipa" id="cIpa"></p>
+            <button class="speak" id="speakBtn" type="button" aria-label="朗读这个词">🔊</button>
+            <p class="flip-hint">点一下看释义 · 空格</p>
+          </div>
+          <div class="face back">
+            <p class="zh" id="cZh"></p>
+            <p class="en" id="cEn"></p>
+            <p class="ex" id="cEx"></p>
+            <p class="syn" id="cSyn"></p>
+          </div>
+        </article>
+        <p class="empty-note" id="emptyNote" hidden>
+          今天这个词单的任务做完了。<br />换个词单，或者去「统计」看看进度。
+        </p>
+      </div>
+
+      <div class="grade-row" id="gradeRow" hidden>
+        <button class="grade g0" data-g="0" type="button">忘了<kbd>1</kbd></button>
+        <button class="grade g1" data-g="1" type="button">模糊<kbd>2</kbd></button>
+        <button class="grade g2" data-g="2" type="button">会了<kbd>3</kbd></button>
+      </div>
+      <div class="card-tools">
+        <button class="btn ghost sm" id="starBtn" type="button">☆ 收进难词本</button>
+        <label class="goal-label">每日 <input type="number" id="goalInput" min="5" max="200" step="5" aria-label="每日目标词数" /> 词</label>
+      </div>
+    </section>
+
+    <!-- 测验 -->
+    <section class="view" id="view-quiz" role="tabpanel" aria-label="测验" hidden>
+      <div class="bar">
+        <select id="quizDeck" aria-label="测验范围"></select>
+        <select id="quizMode" aria-label="测验方式">
+          <option value="en2zh">看英文选中文</option>
+          <option value="zh2en">看中文选英文</option>
+          <option value="spell">听词拼写</option>
+        </select>
+        <button class="btn sm" id="quizNew" type="button">出 10 题</button>
+      </div>
+
+      <div class="quiz-box" id="quizBox">
+        <p class="quiz-empty">点「出 10 题」开始。错的词会自动进入复习队列。</p>
+      </div>
+
+      <div class="quiz-result" id="quizResult" hidden>
+        <h3 id="qrTitle"></h3>
+        <p id="qrDetail"></p>
+        <div class="qr-wrong" id="qrWrong"></div>
+        <button class="btn primary" id="qrAgain" type="button">再来一组</button>
+      </div>
+    </section>
+
+    <!-- 词表 -->
+    <section class="view" id="view-list" role="tabpanel" aria-label="词表" hidden>
+      <div class="bar">
+        <input type="search" id="search" placeholder="搜单词、释义或例句…" aria-label="搜索" />
+        <select id="listDeck" aria-label="筛选词单"></select>
+        <select id="listSort" aria-label="排序">
+          <option value="deck">按词单</option>
+          <option value="az">按字母</option>
+          <option value="box">按掌握度</option>
+          <option value="star">只看难词本</option>
+        </select>
+      </div>
+      <p class="list-count" id="listCount"></p>
+      <div class="word-list" id="wordList"></div>
+    </section>
+
+    <!-- 统计 -->
+    <section class="view" id="view-stat" role="tabpanel" aria-label="统计" hidden>
+      <div class="stat-grid">
+        <div class="stat-card"><b id="sTotal">0</b><span>词库总量</span></div>
+        <div class="stat-card"><b id="sMastered">0</b><span>已掌握</span></div>
+        <div class="stat-card"><b id="sLearning">0</b><span>学习中</span></div>
+        <div class="stat-card"><b id="sFresh">0</b><span>未学</span></div>
+        <div class="stat-card"><b id="sDue">0</b><span>今天待复习</span></div>
+        <div class="stat-card"><b id="sStreak">0</b><span>连续天数</span></div>
+      </div>
+
+      <section class="panel-box">
+        <h3>最近七天</h3>
+        <div class="chart" id="chart" aria-label="最近七天学习量"></div>
+      </section>
+
+      <section class="panel-box">
+        <h3>各词单进度</h3>
+        <div class="deck-progress" id="deckProgress"></div>
+      </section>
+
+      <section class="panel-box">
+        <h3>词库与进度</h3>
+        <p class="tip">内置词库是我按 PTE Academic 考点自行整理编写的，不是官方词表。你可以导入自己的词表替换或追加。</p>
+        <div class="io-row">
+          <button class="btn sm" id="impWordsBtn" type="button">导入词表</button>
+          <button class="btn sm" id="expWordsBtn" type="button">导出词表</button>
+          <button class="btn sm" id="expProgBtn" type="button">备份进度</button>
+          <button class="btn sm" id="impProgBtn" type="button">恢复进度</button>
+          <button class="btn ghost sm danger" id="resetBtn" type="button">清空进度</button>
+        </div>
+        <p class="hint" id="customNote" hidden></p>
+      </section>
+    </section>
+  </main>
+
+  <!-- 导入词表 -->
+  <dialog class="modal" id="impModal" aria-labelledby="impTitle">
+    <div class="modal-head">
+      <h2 id="impTitle">导入词表</h2>
+      <button class="icon-btn" id="impClose" type="button" aria-label="关闭">✕</button>
+    </div>
+    <p class="tip">
+      支持两种格式，每行一个词：<br />
+      · <b>CSV / TSV</b>：<code>单词,词性,中文,英文释义,例句,近义词</code>（从第二列起都可以留空）<br />
+      · <b>JSON</b>：<code>[{"w":"analyse","zh":"分析","ex":"…"}]</code><br />
+      也可以把文件直接拖到下面的框里。
+    </p>
+    <textarea id="impText" rows="9" placeholder="analyse,v.,分析,examine in detail,Researchers analysed the data.,examine&#10;assess,v.,评估,,,"></textarea>
+    <div class="imp-opts">
+      <label><input type="radio" name="impMode" value="append" checked /> 追加到现有词库</label>
+      <label><input type="radio" name="impMode" value="replace" /> 替换现有词库</label>
+    </div>
+    <div class="modal-foot">
+      <span class="imp-msg" id="impMsg"></span>
+      <button class="btn primary" id="impDo" type="button">导入</button>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="helpModal" aria-labelledby="helpTitle">
+    <div class="modal-head">
+      <h2 id="helpTitle">怎么用</h2>
+      <button class="icon-btn" id="helpClose" type="button" aria-label="关闭">✕</button>
+    </div>
+    <ul class="help-list">
+      <li>「背词」是主战场：看到英文先自己回忆，点卡片翻面，再按「忘了 / 模糊 / 会了」给自己评级。</li>
+      <li>评级决定下次见到它的时间：会了往后推（1、2、4、7、15、30、60 天），忘了当天重来。</li>
+      <li>「测验」有三种：看英选中、看中选英、听词拼写。答错的词会自动回到复习队列。</li>
+      <li>没有音标是故意的——用浏览器自带的真人发音朗读，比我写错的音标可靠。导入的词表若带音标会显示。</li>
+      <li>所有进度存在这台设备上，不需要注册登录。记得偶尔「备份进度」。</li>
+      <li><kbd>空格</kbd> 翻面　<kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 评级　<kbd>S</kbd> 朗读　<kbd>F</kbd> 收藏</li>
+    </ul>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
